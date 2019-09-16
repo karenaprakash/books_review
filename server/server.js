@@ -295,7 +295,7 @@ Book.findByIdAndUpdate("5d6e4c837bbc7f5906069bcf",{$set:{name : "Farrari"}},{ ne
     if(process.env.NODE_ENV === 'production'){
         const path  =  require('path');
         app.get('/*',(req,res)=>{
-            res.sendfile(path.resolve(__dirname,'../Frontend','build','index.html'))
+            res.sendfile(path.resolve(__dirname,'Frontend','build','index.html'))
         })
     }
 
