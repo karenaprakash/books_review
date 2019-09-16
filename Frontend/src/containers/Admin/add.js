@@ -147,7 +147,6 @@ renderFileInputField(field){
     
        
     componentDidUpdate = () => {
-
         console.log(this.props.data)
         const length = Object.entries(this.props.data).length;
         if(this.state.isSubmited){
@@ -156,13 +155,9 @@ renderFileInputField(field){
                 if(length_of_newbook != 0){
                     const postUploaded = this.props.data.newbook.post ;
                     if(postUploaded){
-
                     this.setState({
                         bookImage : 'uploaded'
                     })
-
-
-                    
                     //it clears the newdata : {post:true ,id: id} to newdata : { } .So, next time this code is not run
                     this.props.dispatch(clearNewBook())
                   

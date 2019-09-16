@@ -34,14 +34,15 @@
     //GET METHOD : Get one book 
 
     app.get("/api/getBook",(req,res)=>{
+        console.log(req.hostname)
 
         let id = req.query.id;
 
         Book.findById(id,(err,doc)=>{
 
-            const port = process.env.PORT || 3001;
+            //const port = process.env.PORT || 3333;
             const bookImage = doc.bookImage
-            doc.bookImage = `http://localhost:${port}/uploads/`+ bookImage;
+            doc.bookImage = `/images/`+ bookImage;
             if(err) return res.status(400).send(err);
             res.send(doc)
         })
@@ -96,11 +97,11 @@
 
 
 //add static public folder 
-app.use(express.static(__dirname));
+app.use(express.static('Frontend/asset'));
 const multer = require('multer');
 const storage = multer.diskStorage({
     destination : function( req , file , cb ){  
-        cb(null,path.join(__dirname,'/uploads/'));
+        cb(null,'Frontend/asset/images');
     },
     filename: function( req , file , cb ){
         cb(null,new Date().toISOString() + file.originalname);
@@ -138,13 +139,14 @@ const uploadImage = multer({storage : storage})
         Book.findByIdAndUpdate(book_updated._id,book_updated,{new:true},(err,doc)=>{
             console.log(doc)
             if(err) return res.status(400).send(err);
-            doc.bookImage = `http://localhost:${port}/uploads/`+doc.bookImage;
+            doc.bookImage = `/images/`+doc.bookImage;
             res.json({
                 success : true,
                 doc  
             })
         })
     })
+  
  //Post Method for update book without image information 
  app.post("/api/book_without_img_update",(req,res)=>{
     const book_updated = new Book(req.body);
@@ -153,7 +155,7 @@ const uploadImage = multer({storage : storage})
 
     Book.findByIdAndUpdate(book_updated._id,{$set:book_updated},{ new : true },(err,doc)=>{
         if(err) return res.status(400).send(err);
-        doc.bookImage = `http://localhost:${port}/uploads/`+doc.bookImage;
+        doc.bookImage = `/images/`+doc.bookImage;
         res.json({
             success : true,
             doc  
@@ -300,7 +302,7 @@ Book.findByIdAndUpdate("5d6e4c837bbc7f5906069bcf",{$set:{name : "Farrari"}},{ ne
     }
 
   
-    const port = process.env.PORT || 3001;
+    const port = process.env.PORT || 3333;
     app.listen(port,()=>{
         console.log('SERVER RUNNING.')
     })
