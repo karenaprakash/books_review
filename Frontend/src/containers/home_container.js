@@ -46,7 +46,7 @@
     }
 
     function mapStateToProps(state){
-        console.log(state)
+        //console.log(state)
         return {
             books : state.books
         }

@@ -58,7 +58,7 @@ import { getBookWithReviewer , clearBookWithReviewer } from '../../actions';
 
     render() {
         let books = this.props.books;
-        console.log(books)
+        //console.log(books)
         return (
             <div>
                 {this.renderBook(books)}

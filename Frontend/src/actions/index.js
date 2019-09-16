@@ -40,7 +40,7 @@ export function getBookWithReviewer(id){
                     book,
                     reviewer : data
                 }
-                console.log(response)
+               // console.log(response)
                 dispatch({
                     type : 'GET_BOOK_W_REVIEWER',
                     payload : response 

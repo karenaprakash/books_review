@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 /*------- action which all data to data base --------*/
 import { addBook , clearNewBook } from '../../actions'
 /*------- redux form --------*/
-import { Field, reduxForm } from 'redux-form';
+import { Field, reduxForm ,change } from 'redux-form';
 import {reset} from 'redux-form';
 
 class AddBook extends Component {
@@ -37,7 +37,7 @@ class AddBook extends Component {
 
 /*------- renderFileInputField  --------*/
 handleFileChange = (event) => {
-    console.log(this.state.bookImage)
+  //  console.log(this.state.bookImage)
      if(event.target.file){
         this.setState({
             bookImage : event.target.files[0].name
@@ -123,7 +123,7 @@ renderFileInputField(field){
     }
 /*------- onSubmit() : runs on submit  --------*/
     onSubmit(values){
-        console.log(values)
+    //    console.log(values)
         let formData = new FormData();
         formData.append('name', values.name)
         formData.append('author', values.author)
@@ -147,23 +147,27 @@ renderFileInputField(field){
     
        
     componentDidUpdate = () => {
-        console.log(this.props.data)
+       // console.log(this.props.data)
         const length = Object.entries(this.props.data).length;
+        //console.log(length)
+        
         if(this.state.isSubmited){
             if(  length != 0 ){
                 const length_of_newbook = Object.entries(this.props.data.newbook).length;
+                //console.log(this.props.data.newbook)
                 if(length_of_newbook != 0){
                     const postUploaded = this.props.data.newbook.post ;
                     if(postUploaded){
                     this.setState({
                         bookImage : 'uploaded'
                     })
+                    this.props.dispatch(change('AddBook','bookImage',null))
                     //it clears the newdata : {post:true ,id: id} to newdata : { } .So, next time this code is not run
                     this.props.dispatch(clearNewBook())
-                  
+                    
                     //it resets the form 
                     this.props.dispatch(reset('AddBook'))
-
+                    
                     alert('Record Saved Succesfully.')
                     
                     }else if(!postUploaded){
@@ -176,10 +180,14 @@ renderFileInputField(field){
     }
 
     componentWillReceiveProps(newProps){
-        console.log(this.props.data)
+      // console.log(this.props.data)
     }
 
     componentWillUnmount() {
+        this.props.dispatch(clearNewBook())
+    }
+
+    componentWillMount(){
         this.props.dispatch(clearNewBook())
     }
     
@@ -304,9 +312,8 @@ function validate(values){
     return errors;
 }
     /*------- it returns messages when action is called and state going to change  --------*/
-
+   
 function mapStateToProps(state){
-    console.log(state)
     return {
         data: state.books,
     }

@@ -40,7 +40,7 @@ class EditBook extends PureComponent {
     }
 
     componentWillMount(){
-        console.log(this.state.isFormChanged)
+        //console.log(this.state.isFormChanged)
         this.props.dispatch(getBook(this.props.match.params.id))
     }
 
@@ -177,7 +177,7 @@ renderFileInputField(field){
         }
         
 
-        console.log(values.bookImage)
+       // console.log(values.bookImage)
 
         let formData = new FormData();
         formData.append('name', values.name)
@@ -192,7 +192,7 @@ renderFileInputField(field){
             formData.append('bookImage', values.bookImage[0]);
             this.props.dispatch(updateBook_with_image(formData))  
         }else{
-            console.log(values)
+          //  console.log(values)
             this.props.dispatch(updateBook_without_image(values))              
         } 
       
@@ -204,7 +204,7 @@ renderFileInputField(field){
        
         const length = Object.entries(book).length;
      
-        console.log(this.state.isFormChanged)
+       // console.log(this.state.isFormChanged)
         return (
                     <div className="Form">
                         <div className="top">
