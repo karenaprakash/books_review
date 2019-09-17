@@ -40,7 +40,10 @@
 
         Book.findById(id,(err,doc)=>{
             //const port = process.env.PORT || 3333;
-
+            /**
+             * Localhost
+             */
+            /*
             const host = req.host;
             const port = process.env.PORT || 3333;
             //console.log(port)
@@ -49,9 +52,8 @@
             //console.log(host)
             //console.log(doc.bookImage)
             doc.bookImage = filePath;
-
-           // const bookImage = doc.bookImage
-            //doc.bookImage = `/images/`+ bookImage;
+            */
+            doc.bookImage = `/images/`+doc.bookImage;
             if(err) return res.status(400).send(err);
             res.send(doc)
         })
@@ -167,12 +169,17 @@ const uploadImage = multer({storage : storage,
         Book.findByIdAndUpdate(book_updated._id,book_updated,{new:true},(err,doc)=>{
             console.log(doc)
             if(err) return res.status(400).send(err);
+           /**
+            * Localhost
+            */
+           /*
             const host = req.host;
             const port = process.env.PORT || 3333;
             const filePath = req.protocol + "://" + host + ':' + port + '/images/' + doc.bookImage ; 
             doc.bookImage = filePath;
-           
-           //doc.bookImage = `/images/`+doc.bookImage;
+           */
+
+            doc.bookImage = `/images/`+doc.bookImage;
             res.json({
                 success : true,
                 doc  
@@ -188,12 +195,17 @@ const uploadImage = multer({storage : storage,
 
     Book.findByIdAndUpdate(book_updated._id,{$set:book_updated},{ new : true },(err,doc)=>{
         if(err) return res.status(400).send(err);
-        const host = req.host;
-        const port = process.env.PORT || 3333;
-        const filePath = req.protocol + "://" + host + ':' + port + '/images/' + doc.bookImage ; 
-        console.log(filePath)
-        doc.bookImage = filePath;
-        //doc.bookImage = `/images/`+doc.bookImage;
+          /**
+            * Localhost
+            */
+           /*
+            const host = req.host;
+            const port = process.env.PORT || 3333;
+            const filePath = req.protocol + "://" + host + ':' + port + '/images/' + doc.bookImage ; 
+            doc.bookImage = filePath;
+           */
+
+          doc.bookImage = `/images/`+doc.bookImage;
        
         res.json({
             success : true,
