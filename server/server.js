@@ -7,7 +7,7 @@
     const mongoose = require('mongoose');
     const config = require('./config/config').get(process.env.NODE_ENV);
     const app = express();
-    const path = require('path');
+    
 
     mongoose.Promise = global.Promise;
     mongoose.connect(config.DATABASE);
@@ -39,10 +39,19 @@
         let id = req.query.id;
 
         Book.findById(id,(err,doc)=>{
-
             //const port = process.env.PORT || 3333;
-            const bookImage = doc.bookImage
-            doc.bookImage = `/images/`+ bookImage;
+
+            const host = req.host;
+            const port = process.env.PORT || 3333;
+            //console.log(port)
+            const filePath = req.protocol + "://" + host + ':' + port + '/images/' + doc.bookImage ; 
+            //console.log(req.protocol)
+            //console.log(host)
+            //console.log(doc.bookImage)
+            doc.bookImage = filePath;
+
+           // const bookImage = doc.bookImage
+            //doc.bookImage = `/images/`+ bookImage;
             if(err) return res.status(400).send(err);
             res.send(doc)
         })
@@ -96,23 +105,40 @@
 /*----------- Multer -----------*/
 
 
+
+app.use('/images',express.static('server/uploads'));
+
 //add static public folder 
-app.use(express.static('Frontend/public'));
+//app.use(express.static('Frontend/public'));
 
 const multer = require('multer');
+
 const storage = multer.diskStorage({
     destination : function( req , file , cb ){  
-        cb(null,'Frontend/public/images');
+        cb(null,'server/uploads');
     },
     filename: function( req , file , cb ){
         cb(null,new Date().toISOString() + file.originalname);
     }
 })
-const uploadImage = multer({storage : storage})
+
+const fileFilter = (req,file,cb) => {
+    if(file.mimetype === 'image/jpg' ||  file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' ){
+        cb(null,true);
+    }else{
+        //rejects storing file 
+        cb(null,false);
+    }
+}
+
+const uploadImage = multer({storage : storage,
+                            limits : { fileSize : 1024 * 1024 * 5},
+                            fileFilter : fileFilter
+                    })
 
 /*============ Image upload End ===========*/
 
-    app.post("/api/book",uploadImage.single('bookImage'),(req,res)=>{
+    app.post("/api/book",uploadImage.single('bookImage'),(req,res ,next)=>{
         const book = new Book(req.body);
         book.bookImage = req.file.filename;
 
@@ -141,13 +167,12 @@ const uploadImage = multer({storage : storage})
         Book.findByIdAndUpdate(book_updated._id,book_updated,{new:true},(err,doc)=>{
             console.log(doc)
             if(err) return res.status(400).send(err);
-           /* const host = req.host;
+            const host = req.host;
             const port = process.env.PORT || 3333;
             const filePath = req.protocol + "://" + host + ':' + port + '/images/' + doc.bookImage ; 
-            console.log(filePath)
             doc.bookImage = filePath;
-            */
-           doc.bookImage = `/images/`+doc.bookImage;
+           
+           //doc.bookImage = `/images/`+doc.bookImage;
             res.json({
                 success : true,
                 doc  
@@ -163,9 +188,13 @@ const uploadImage = multer({storage : storage})
 
     Book.findByIdAndUpdate(book_updated._id,{$set:book_updated},{ new : true },(err,doc)=>{
         if(err) return res.status(400).send(err);
+        const host = req.host;
+        const port = process.env.PORT || 3333;
+        const filePath = req.protocol + "://" + host + ':' + port + '/images/' + doc.bookImage ; 
+        console.log(filePath)
+        doc.bookImage = filePath;
         //doc.bookImage = `/images/`+doc.bookImage;
-      
-       doc.bookImage = `/images/`+doc.bookImage;
+       
         res.json({
             success : true,
             doc  
