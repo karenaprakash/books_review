@@ -97,11 +97,12 @@
 
 
 //add static public folder 
-app.use(express.static('Frontend/asset'));
+app.use(express.static('Frontend/public'));
+
 const multer = require('multer');
 const storage = multer.diskStorage({
     destination : function( req , file , cb ){  
-        cb(null,'Frontend/asset/images');
+        cb(null,'Frontend/public/images');
     },
     filename: function( req , file , cb ){
         cb(null,new Date().toISOString() + file.originalname);
@@ -114,7 +115,8 @@ const uploadImage = multer({storage : storage})
     app.post("/api/book",uploadImage.single('bookImage'),(req,res)=>{
         const book = new Book(req.body);
         book.bookImage = req.file.filename;
-        console.log(book)
+
+       // console.log(book)
         book.save((err,doc)=>{
             
             if(err) return res.json({
@@ -139,7 +141,11 @@ const uploadImage = multer({storage : storage})
         Book.findByIdAndUpdate(book_updated._id,book_updated,{new:true},(err,doc)=>{
             console.log(doc)
             if(err) return res.status(400).send(err);
-            doc.bookImage = `/images/`+doc.bookImage;
+            const host = req.host;
+            const port = process.env.PORT || 3333;
+            const filePath = req.protocol + "://" + host + ':' + port + '/images/' + doc.bookImage ; 
+            console.log(filePath)
+            doc.bookImage = filePath;
             res.json({
                 success : true,
                 doc  
@@ -155,7 +161,12 @@ const uploadImage = multer({storage : storage})
 
     Book.findByIdAndUpdate(book_updated._id,{$set:book_updated},{ new : true },(err,doc)=>{
         if(err) return res.status(400).send(err);
-        doc.bookImage = `/images/`+doc.bookImage;
+        //doc.bookImage = `/images/`+doc.bookImage;
+        const host = req.host;
+        const port = process.env.PORT || 3333;
+        const filePath = req.protocol + "://" + host + ':' + port + '/images' + doc.bookImage ; 
+        console.log(filePath)
+        doc.bookImage = filePath;
         res.json({
             success : true,
             doc  
