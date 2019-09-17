@@ -292,7 +292,7 @@ renderFileInputField(field){
                             {
                                 length == 0 || book.book == null ? null :
                                 <div className="br_image">
-                                    <img src={`${book.book.bookImage}`} alt='product'/>
+                                    <img src={`/images/${book.book.bookImage}`} alt='product'/>
                                 </div>
                             }
                           

@@ -31,7 +31,7 @@ import { getBookWithReviewer , clearBookWithReviewer } from '../../actions';
                 <span>Review By:</span> { books.reviewer.name } {books.reviewer.lastname}
             </div>
             <div className="br_image">
-                    <img src={`${books.book.bookImage}`} alt='book'/>
+                    <img src={`/images/${books.book.bookImage}`} alt='book'/>
             </div>
          </div> 
          <div className="br_review">

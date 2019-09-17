@@ -53,7 +53,7 @@
             //console.log(doc.bookImage)
             doc.bookImage = filePath;
             */
-            doc.bookImage = `/images/`+doc.bookImage;
+            doc.bookImage = doc.bookImage;
             if(err) return res.status(400).send(err);
             res.send(doc)
         })
@@ -179,7 +179,7 @@ const uploadImage = multer({storage : storage,
             doc.bookImage = filePath;
            */
 
-            doc.bookImage = `/images/`+doc.bookImage;
+            doc.bookImage = doc.bookImage;
             res.json({
                 success : true,
                 doc  
@@ -205,7 +205,7 @@ const uploadImage = multer({storage : storage,
             doc.bookImage = filePath;
            */
 
-          doc.bookImage = `/images/`+doc.bookImage;
+          doc.bookImage = doc.bookImage;
        
         res.json({
             success : true,
