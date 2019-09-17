@@ -164,12 +164,7 @@ const uploadImage = multer({storage : storage})
     Book.findByIdAndUpdate(book_updated._id,{$set:book_updated},{ new : true },(err,doc)=>{
         if(err) return res.status(400).send(err);
         //doc.bookImage = `/images/`+doc.bookImage;
-       /* const host = req.host;
-        const port = process.env.PORT || 3333;
-        const filePath = req.protocol + "://" + host + ':' + port + '/images' + doc.bookImage ; 
-        console.log(filePath)
-        doc.bookImage = filePath;
-        */
+      
        doc.bookImage = `/images/`+doc.bookImage;
         res.json({
             success : true,
