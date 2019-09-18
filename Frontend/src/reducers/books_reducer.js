@@ -23,8 +23,21 @@ export default function(state={},action){
         }
         case 'ADD_BOOK':
         return{
-            ...state,newbook : action.payload
+            ...state, bookImage : action.payload
         }
+        case 'ADD_BOOK_START' : 
+        return{
+            ...state, bookImage : action.payload
+        }
+        case 'ADD_BOOK_ERROR' : 
+        return{
+            ...state, bookImage : action.payload
+        }
+        case 'ADD_BOOK_SUCCESS' : 
+        return{
+            ...state, bookImage : action.payload
+        }
+      
         case 'CLEAR_NEWBOOK':
         return{
             ...state, newbook : action.payload

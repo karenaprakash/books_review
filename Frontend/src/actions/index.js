@@ -2,6 +2,11 @@
  *  actions : all actions which are used in this project
  */
 import axios from 'axios';
+import {reset} from 'redux-form';
+
+/*-------- firebase -------------*/
+import {storage , API_URL } from '../firebase-config.js';
+
 //getBooks : get all books
 export function getBooks(
     limit = 10,
@@ -64,16 +69,125 @@ export function clearBookWithReviewer(){
 }
 
 
-//addBook : add book action
-export function addBook(book){
-    const request = axios.post('/api/book',book)
-                    .then(response => response.data);
+/*
+export function  addBook(book) {
+    console.log(book.get('bookImage'))
+    let currentImageName = "firebase-image-"+Date.now();
+    let uploadImage = storage.ref(`images/${currentImageName}`).put(book.get('bookImage'));
+    uploadImage.on('state_changed',
+        (snapshot) => { console.log('image uploaded') },
+        (error) => {
+            alert(error);
+        },
+        () => {
+            storage.ref('images').child(currentImageName).getDownloadURL().
+            then(url => {
+                const  bookImage = url;
+                let formData = new FormData();
+                formData = book;
+                
+                book.bookImage = bookImage;
 
+                if(url){
+                    const request = axios.post('/api/book',book)
+                    .then(response => {
+                        alert('Data uploaded Successfully.')
+                        return response.data 
+                    })
+                    .catch((err) => {
+                        alert('error while uploading image using firebase storage')
+                    });
+    
                     return{
-                        type : 'ADD_BOOK',
+                        type : 'ADD_BOOKIMAGE_IN_FB',
                         payload : request
                     }
+                }
+                
+            })
+        }
+    )
 }
+*/
+
+function addBookStart() {
+    console.log('start')
+	return {
+		type: 'ADD_BOOK_START',
+		payload: 'start'
+	};
+}
+
+function addBookSuccess(response) {
+    console.log('done')
+	return {
+		type: 'ADD_BOOK_SUCCESS',
+		payload: 'done'
+	};
+}
+
+function addBookError(error) {
+    console.log(error);
+	return {
+		type: 'ADD_BOOK_ERROR',
+		payload: 'error'
+	};
+}
+
+//addBook : add book action
+export const addBook = (book) => 
+    (dispatch ) =>{
+  
+    let currentImageName = "firebase-image-"+Date.now();
+    let uploadImage = storage.ref(`images/${currentImageName}`).put(book.bookImage[0]);
+    uploadImage.on('state_changed',
+        (snapshot) => { 
+            dispatch(addBookStart());
+         },
+        (error) => {
+            dispatch(addBookError(error));
+        },
+        () => {
+            storage.ref('images').child(currentImageName).getDownloadURL().
+            then(url => {
+                
+               book.bookImage = url
+                console.log(book);
+                if(url){
+                    const request = axios.post('/api/book',book)
+                    .then(response => {
+                        console.log(response.data);
+                        if(response.data.post){
+                            alert('Data uploaded Successfully.')
+                            dispatch(reset('AddBook'))
+                            dispatch(addBookSuccess(response))
+                        }else{
+                            dispatch(addBookError('error'));
+                            alert('Error while uploading data.Please try again later')
+                        }
+                        
+                       
+                        return response.data 
+                    })
+                    .catch((err) => {
+                         dispatch(addBookError(err));
+                        alert('error while uploading image using firebase storage')
+                    });
+                   /*
+                    return{
+                        type : 'ADD_BOOKIMAGE_IN_FB',
+                        payload : request
+                    }
+                    */
+                }
+                
+            })
+        }
+    )
+}
+
+
+
 //clearNewBook : clear new book in add review page 
 export function clearNewBook(){
     return{
@@ -101,6 +215,7 @@ export function getBook(id){
             payload : request
         }
 }
+/*
 //updateBook_with_image
 export function updateBook_with_image(data){
     const request = axios.post(`/api/book_with_img_update`,data)
@@ -110,6 +225,98 @@ export function updateBook_with_image(data){
         payload : request
     }
 }
+*/
+
+/*=================================================================*/
+
+
+function EditBookStart() {
+    console.log('start')
+	return {
+		type: 'ADD_BOOK_START',
+		payload: 'start'
+	};
+}
+
+function EditBookSuccess(response) {
+    console.log('done')
+	return {
+		type: 'UPDATE_BOOK_WITH_IMG',
+		payload: response
+	};
+}
+
+function EditBookError(error) {
+    console.log(error);
+	return {
+		type: 'ADD_BOOK_ERROR',
+		payload: 'error'
+	};
+}
+
+//addBook : add book action
+export const updateBook_with_image = (book) => 
+    (dispatch ) =>{
+  
+    let currentImageName = "firebase-image-"+Date.now();
+    let uploadImage = storage.ref(`images/${currentImageName}`).put(book.bookImage[0]);
+    uploadImage.on('state_changed',
+        (snapshot) => { 
+            dispatch(EditBookStart());
+         },
+        (error) => {
+            dispatch(EditBookError(error));
+        },
+        () => {
+            storage.ref('images').child(currentImageName).getDownloadURL().
+            then(url => {
+                
+               book.bookImage = url
+                console.log(book);
+                if(url){
+
+                    const request = axios.post(`/api/book_with_img_update`,book)
+                     .then(response => response.data)
+                     dispatch(EditBookSuccess(request))
+                    /*
+                    const request = axios.post('/api/book',book)
+                    .then(response => {
+                        console.log(response.data);
+                        if(response.data.post){
+                            alert('Data uploaded Successfully.')
+                            dispatch(reset('AddBook'))
+                            dispatch(EditBookSuccess(response))
+                        }else{
+                            dispatch(EditBookError('error'));
+                            alert('Error while uploading data.Please try again later')
+                        }                       
+                        return response.data 
+                    })
+                    .catch((err) => {
+                         dispatch(addBookError(err));
+                        alert('error while uploading image using firebase storage')
+                    });
+                    */
+
+
+
+                   /*
+                    return{
+                        type : 'ADD_BOOKIMAGE_IN_FB',
+                        payload : request
+                    }
+                    */
+                }
+                
+            })
+        }
+    )
+}
+
+
+
+
+/*=================================================================*/
 
 //updateBook_without_image
 export function updateBook_without_image(data){
@@ -121,7 +328,10 @@ export function updateBook_without_image(data){
     }
 }
 //deleteBook
-export function deleteBook(id){
+export function deleteBook(id,image){
+   // console.log(image);
+    let deleteImage = storage.refFromURL(image).delete();
+
     const request = axios.delete(`/api/delete_book?id=${id}`)
                     .then(response => response.data)
 

@@ -29,7 +29,17 @@ class EditBook extends PureComponent {
     
 
     deletePost = () => {
-        this.props.dispatch(deleteBook(this.props.match.params.id))
+        let book = this.props.book;
+       
+        const length = Object.entries(book).length;
+        let image = ''
+        if( length == 0 || book.book == null){
+          
+        }else{
+            console.log(book.book.bookImage);
+            image = book.book.bookImage;
+        }
+        this.props.dispatch(deleteBook(this.props.match.params.id,image))
         window.scrollTo(0, 0);
     }
 
@@ -47,6 +57,33 @@ class EditBook extends PureComponent {
     componentWillUnmount(){
         this.props.dispatch(clearBook())
     }
+
+    
+    componentWillReciveProps(nextProps) {
+
+        console.log(this.props);
+        console.log(nextProps);
+
+        /*
+        let book = this.props.book;
+        console.log(book);
+        const length = Object.entries(book).length;
+        let image = ''
+        if( length == 0 || book.book == null){
+          console.log('err');
+        }else{
+            console.log(book.book.bookImage);
+            if(this.state.isBookSelected)
+            image = book.book.bookImage;
+            this.setState({
+                formData : {
+                    bookImage : image
+                }
+            })
+        }
+        */
+    }
+    
     
   
    
@@ -179,18 +216,9 @@ renderFileInputField(field){
 
        // console.log(values.bookImage)
 
-        let formData = new FormData();
-        formData.append('name', values.name)
-        formData.append('_id', this.props.match.params.id)
-        formData.append('author', values.author)
-        formData.append('review',  values.review)
-        formData.append('pages', values.pages)  
-        formData.append('price', values.price)  
-        formData.append('rating', values.rating)
-        formData.append( 'ownerId' , this.props.user.login.id )
+    
         if(this.state.formData.isBookSelected && typeof values.bookImage !== 'string' && values.bookImage !== null ){
-            formData.append('bookImage', values.bookImage[0]);
-            this.props.dispatch(updateBook_with_image(formData))  
+            this.props.dispatch(updateBook_with_image(values))  
         }else{
           //  console.log(values)
             this.props.dispatch(updateBook_without_image(values))              
@@ -203,7 +231,7 @@ renderFileInputField(field){
         let book = this.props.book;
        
         const length = Object.entries(book).length;
-     
+       // console.log(this.state.formData);
        // console.log(this.state.isFormChanged)
         return (
                     <div className="Form">
@@ -292,7 +320,7 @@ renderFileInputField(field){
                             {
                                 length == 0 || book.book == null ? null :
                                 <div className="br_image">
-                                    <img src={`/images/${book.book.bookImage}`} alt='product'/>
+                                    <img src={`${book.book.bookImage}`} alt='product'/>
                                 </div>
                             }
                           
@@ -302,7 +330,7 @@ renderFileInputField(field){
                             
                             <div className="delete_post">
                                         <div className="button"
-                                            onClick={this.deletePost}
+                                            onClick={() => this.deletePost()}
                                         >
                                             Delete Review
                                         </div>

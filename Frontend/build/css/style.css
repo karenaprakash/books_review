@@ -420,7 +420,7 @@ header .navItem span {
   border-radius: 50%;
 }
 .loader {
-    color: #ebebeb;
+  color: #ebebeb;
   font-size: 11px;
   text-indent: -99999em;
   margin: 55px auto;

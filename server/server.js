@@ -140,9 +140,9 @@ const uploadImage = multer({storage : storage,
 
 /*============ Image upload End ===========*/
 
-    app.post("/api/book",uploadImage.single('bookImage'),(req,res ,next)=>{
+    app.post("/api/book",(req,res ,next)=>{
         const book = new Book(req.body);
-        book.bookImage = req.file.filename;
+        console.log(book);
 
        // console.log(book)
         book.save((err,doc)=>{
@@ -155,6 +155,7 @@ const uploadImage = multer({storage : storage,
                 post : true,
                 bookId : doc._id
             })
+            console.log('uploaded');
         })
     })
     
@@ -162,9 +163,8 @@ const uploadImage = multer({storage : storage,
     /*------------- UPDATE ------------------*/
     
     //Post Method for update book with image information 
-    app.post("/api/book_with_img_update",uploadImage.single('bookImage'),(req,res)=>{
+    app.post("/api/book_with_img_update",(req,res)=>{
         const book_updated = new Book(req.body);
-        book_updated.bookImage = req.file.filename;
        
         Book.findByIdAndUpdate(book_updated._id,book_updated,{new:true},(err,doc)=>{
             console.log(doc)

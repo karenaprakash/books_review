@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+/*-------- firebase -------------*/
+import {storage , API_URL } from '../../firebase-config.js';
 
 /*------- connect react with redux --------*/
 import { connect } from 'react-redux';
@@ -8,13 +10,16 @@ import { connect } from 'react-redux';
 import { addBook , clearNewBook } from '../../actions'
 /*------- redux form --------*/
 import { Field, reduxForm ,change } from 'redux-form';
-import {reset} from 'redux-form';
 
 class AddBook extends Component {
 
     state = {
         bookImage : null,
-        isSubmited : false
+        bookName : '',
+        imageUrl : '',
+        isSubmited : false,
+        bookData : null,
+        loader : false
     }
 
     //PRISTINE / DIRTY // TOUCHED / ERROR : events in redux-form 
@@ -37,25 +42,38 @@ class AddBook extends Component {
 
 /*------- renderFileInputField  --------*/
 handleFileChange = (event) => {
+    console.log(event.target.files[0]);
+    if (event.target.files && event.target.files[0]) {
+        this.setState({
+          imageUrl : URL.createObjectURL(event.target.files[0])
+        });
+      }
+
   //  console.log(this.state.bookImage)
      if(event.target.file){
         this.setState({
-            bookImage : event.target.files[0].name
+            bookImage : event.target.files[0],
+            bookName : event.target.files[0].name
         })
      } 
      
 }
 
-renderFileInputField(field){
-    //const fileInputKey = field.input.value ? field.input.value.name : +new Date();  // key = {fileInputKey}
+
+
+renderFileInputField = (field) => {
+    const fileInputKey = field.input.value ? field.input.value.name : +new Date();  // key = {fileInputKey}
     const className = `form-input ${field.meta.touched && field.meta.error ? 'has-error':''}`;
+    console.log(field.input.value);
+
+
     return (
         <div className={className}>
             <label>{field.myLabel}</label>
             <input 
+            key={fileInputKey}
             type="file"   
             onChange = {field.input.onChange} 
-           
             />
             <div className="error">
                 {field.meta.touched ? field.meta.error:''}
@@ -121,66 +139,23 @@ renderFileInputField(field){
             </div>
         )
     }
+
+
+
+
+
+
+
+  
 /*------- onSubmit() : runs on submit  --------*/
-    onSubmit(values){
-    //    console.log(values)
-        let formData = new FormData();
-        formData.append('name', values.name)
-        formData.append('author', values.author)
-        formData.append('review', values.review)
-        formData.append('pages', values.pages)  
-        formData.append('price', values.price)  
-        formData.append('rating', values.rating)
-        formData.append( 'ownerId' , this.props.user.login.id )
-        if (typeof values.bookImage !== 'string' && values.bookImage !== null) {
-          formData.append('bookImage', values.bookImage[0]);
-          }
-        //  console.log(formData)
-          this.props.dispatch(addBook(
-            formData
-         ))
+    onSubmit(values){       
+          values.ownerId = this.props.user.login.id;
+         // console.log(values)
+          this.props.dispatch(addBook(values));
+      
          this.setState({
              isSubmited : true
          })
-    }
-
-    
-       
-    componentDidUpdate = () => {
-       // console.log(this.props.data)
-        const length = Object.entries(this.props.data).length;
-        //console.log(length)
-        
-        if(this.state.isSubmited){
-            if(  length != 0 ){
-                const length_of_newbook = Object.entries(this.props.data.newbook).length;
-                //console.log(this.props.data.newbook)
-                if(length_of_newbook != 0){
-                    const postUploaded = this.props.data.newbook.post ;
-                    if(postUploaded){
-                    this.setState({
-                        bookImage : 'uploaded'
-                    })
-                    this.props.dispatch(change('AddBook','bookImage',null))
-                    //it clears the newdata : {post:true ,id: id} to newdata : { } .So, next time this code is not run
-                    this.props.dispatch(clearNewBook())
-                    
-                    //it resets the form 
-                    this.props.dispatch(reset('AddBook'))
-                    
-                    alert('Record Saved Succesfully.')
-                    
-                    }else if(!postUploaded){
-                     alert('Error while storing record.')
-                    }
-                }
-            }
-        }
-        
-    }
-
-    componentWillReceiveProps(newProps){
-      // console.log(this.props.data)
     }
 
     componentWillUnmount() {
@@ -194,13 +169,15 @@ renderFileInputField(field){
   
     render(){
 
+       // console.log(this.props);
+
         return(
             <div className="Form">
                 <div className="top">
                     <h3>Add a Review</h3>
                     <Link to="/">Back</Link>
                 </div>
-
+                  
                 <form onSubmit={this.props.handleSubmit((event)=>this.onSubmit(event))} method="POST" encType="multipart/form-data">
 
                     <Field
@@ -253,7 +230,20 @@ renderFileInputField(field){
                     onChange={this.handleFileChange}
                     component={this.renderFileInputField}
                     />
-
+                    {
+                    this.state.imageUrl !== '' && this.props.data.bookImage !== null ?
+                    <div className="br_image">
+                        <img src={this.state.imageUrl} alt='product'/>
+                    </div> 
+                    : null
+                    
+                    }
+                    {
+                        this.props.data.bookImage !== null && this.props.data.bookImage === 'start' ?
+                        <div className="loader"> Loading... </div>
+                        : null
+                    }
+                
                     <button type="submit">Submit</button>
 
                 </form>
@@ -314,16 +304,31 @@ function validate(values){
     /*------- it returns messages when action is called and state going to change  --------*/
    
 function mapStateToProps(state){
+    console.log(state.books)
+    const book = state.books.book
+    let book_value = {}
+    book_value =  {
+        name : '',
+        author : '',
+        review : '',
+        pages : '',
+        rating : '',
+        price : '',
+        bookImage : ''
+    }
+
     return {
         data: state.books,
+        initialValues : book_value,
     }
 }
 
     /*------- reduxForm : connects redux-form with react form   --------*/
 
-export default reduxForm({
-    validate,
-    form:'AddBook',
-})(
-    connect(mapStateToProps,{addBook,clearNewBook})(AddBook)
-)
+ export default connect( mapStateToProps, {addBook,clearNewBook})(
+    reduxForm({
+        validate,
+        form: 'AddBook',
+        enableReinitialize : true,
+    })(AddBook)
+ );

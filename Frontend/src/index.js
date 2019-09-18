@@ -7,8 +7,10 @@ import promiseMiddleware from 'redux-promise';
 import ReduxThunk from 'redux-thunk';
 import Routes from './routes';
 import reducers from './reducers';
+import {firebase,storage} from './firebase-config.js'
+import { reactReduxFirebase, firebaseReducer } from 'react-redux-firebase'
 
-const createStoreWithMiddleware =  applyMiddleware(promiseMiddleware,ReduxThunk)(createStore);
+const createStoreWithMiddleware =  applyMiddleware(promiseMiddleware,ReduxThunk.withExtraArgument({firebase,storage}))(createStore);
 
 ReactDOM.render( 
     <Provider store={createStoreWithMiddleware( reducers )}>
