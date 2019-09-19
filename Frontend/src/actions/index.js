@@ -5,7 +5,7 @@ import axios from 'axios';
 import {reset} from 'redux-form';
 
 /*-------- firebase -------------*/
-import {storage , API_URL } from '../firebase-config.js';
+import {storage } from '../firebase-config.js';
 
 //getBooks : get all books
 export function getBooks(
@@ -148,9 +148,8 @@ export const addBook = (book) =>
             dispatch(addBookError(error));
         },
         () => {
-            storage.ref('images').child(currentImageName).getDownloadURL().
-            then(url => {
-                
+            storage.ref('images').child(currentImageName).getDownloadURL()
+            .then(url => {                
                book.bookImage = url
                 console.log(book);
                 if(url){
@@ -181,7 +180,7 @@ export const addBook = (book) =>
                     */
                 }
                 
-            })
+            });
         }
     )
 }

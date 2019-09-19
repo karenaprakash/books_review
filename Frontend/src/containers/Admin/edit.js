@@ -13,7 +13,6 @@ import { getBook , updateBook_with_image , updateBook_without_image , clearBook 
 
 /*------- redux form --------*/
 import { Field, reduxForm } from 'redux-form';
-import book_view from '../../components/BookView/book_view';
 
 
 class EditBook extends PureComponent {
@@ -33,10 +32,10 @@ class EditBook extends PureComponent {
        
         const length = Object.entries(book).length;
         let image = ''
-        if( length == 0 || book.book == null){
-          
+        if( length === 0 || book.book === null){
+          return
         }else{
-            console.log(book.book.bookImage);
+           // console.log(book.book.bookImage);
             image = book.book.bookImage;
         }
         this.props.dispatch(deleteBook(this.props.match.params.id,image))
@@ -318,7 +317,7 @@ renderFileInputField(field){
                             component={this.renderFileInputField}
                             />
                             {
-                                length == 0 || book.book == null ? null :
+                                length === 0 || book.book === null ? null :
                                 <div className="br_image">
                                     <img src={`${book.book.bookImage}`} alt='product'/>
                                 </div>
@@ -385,7 +384,7 @@ function validate(values){
  */
      
  
-     if(!values.bookImage || values.bookImage.length == 0 || values.bookImage ==null){
+     if(!values.bookImage || values.bookImage.length === 0 || values.bookImage === null){
          errors.bookImage = "The bookImage is empty"
      }
  
@@ -418,7 +417,7 @@ function validate(values){
     const books = state.books
     let book_value = {}
     const length = Object.entries(books).length;
-    if( length != 0 && typeof(books.book) === "object" && books.book != null ){
+    if( length !== 0 && typeof(books.book) === "object" && books.book !== null ){
         const book = state.books.book
         book_value =  {
             _id : book._id,

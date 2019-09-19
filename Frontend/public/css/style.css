@@ -187,7 +187,10 @@ header .navItem span {
     border-radius: 3px;
     border: none;
     margin-top: 20px;
-    width: 80%;
+    width: 95%;
+    text-align: center;
+    justify-content: center;
+    position: relative;
     
 }
 

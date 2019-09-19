@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-/*-------- firebase -------------*/
-import {storage , API_URL } from '../../firebase-config.js';
 
 /*------- connect react with redux --------*/
 import { connect } from 'react-redux';
@@ -9,7 +7,7 @@ import { connect } from 'react-redux';
 /*------- action which all data to data base --------*/
 import { addBook , clearNewBook } from '../../actions'
 /*------- redux form --------*/
-import { Field, reduxForm ,change } from 'redux-form';
+import { Field, reduxForm  } from 'redux-form';
 
 class AddBook extends Component {
 
@@ -19,7 +17,8 @@ class AddBook extends Component {
         imageUrl : '',
         isSubmited : false,
         bookData : null,
-        loader : false
+        loader : false,
+        show : true
     }
 
     //PRISTINE / DIRTY // TOUCHED / ERROR : events in redux-form 
@@ -45,7 +44,8 @@ handleFileChange = (event) => {
     console.log(event.target.files[0]);
     if (event.target.files && event.target.files[0]) {
         this.setState({
-          imageUrl : URL.createObjectURL(event.target.files[0])
+          imageUrl : URL.createObjectURL(event.target.files[0]),
+          show : true
         });
       }
 
@@ -56,16 +56,19 @@ handleFileChange = (event) => {
             bookName : event.target.files[0].name
         })
      } 
-     
+    
 }
 
 
 
 renderFileInputField = (field) => {
-    const fileInputKey = field.input.value ? field.input.value.name : +new Date();  // key = {fileInputKey}
+    if(field.input.value){
+        console.log(field.input.value.length)
+    }
+    const fileInputKey = field.input.value ? this.state.bookName : +new Date();  // key = {fileInputKey}
+    console.log(fileInputKey)
     const className = `form-input ${field.meta.touched && field.meta.error ? 'has-error':''}`;
-    console.log(field.input.value);
-
+    //console.log(field.input.value);
 
     return (
         <div className={className}>
@@ -159,17 +162,47 @@ renderFileInputField = (field) => {
     }
 
     componentWillUnmount() {
+        console.log('component will unmount')
+
         this.props.dispatch(clearNewBook())
     }
 
     componentWillMount(){
+        console.log('component will mount')
         this.props.dispatch(clearNewBook())
     }
+
+    componentDidUpdate(){
+        console.log('component did update')
+    }
+
+    componentWillUpdate(){
+        console.log('component will update')
+    }
+
+    shouldComponentUpdate(){
+        console.log('component should update')
+        return true
+    }
     
+    componentWillReceiveProps(nextProps){
+        console.log('component will reciveProps')
+
+       // if our data is stored in database then it hide the previous image.
+        if(this.state.imageUrl !== '' && nextProps.data.bookImage !== null && nextProps.data.bookImage === "done"){
+            this.setState({
+                show : false
+            })
+            //making our anser 'done' to empty for next uploadation
+            nextProps.data.bookImage = '';
+        }
+        console.log(nextProps)
+      
+    }
   
     render(){
 
-       // console.log(this.props);
+       //console.log(this.props);
 
         return(
             <div className="Form">
@@ -231,7 +264,7 @@ renderFileInputField = (field) => {
                     component={this.renderFileInputField}
                     />
                     {
-                    this.state.imageUrl !== '' && this.props.data.bookImage !== null ?
+                    this.state.imageUrl !== '' && this.props.data.bookImage !== null && this.state.show?
                     <div className="br_image">
                         <img src={this.state.imageUrl} alt='product'/>
                     </div> 
@@ -293,7 +326,7 @@ function validate(values){
 */
     
 
-    if(!values.bookImage || values.bookImage.length == 0 ){
+    if(!values.bookImage || values.bookImage.length === 0 ){
         errors.bookImage = "The bookImage is empty"
     }
 
@@ -304,8 +337,8 @@ function validate(values){
     /*------- it returns messages when action is called and state going to change  --------*/
    
 function mapStateToProps(state){
-    console.log(state.books)
-    const book = state.books.book
+    //console.log(state.books)
+    
     let book_value = {}
     book_value =  {
         name : '',
